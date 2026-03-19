@@ -1,0 +1,24 @@
+{
+  "case_id": "B",
+  
+  "__comment_geom__": "=== 几何参数 (Case B 特有: t=2.5, rib_off=100) ===",
+  "L": 800.0,
+  "W": 500.0,
+  "t": 2.5,
+  "rib_w": 40.0,
+  "rib_h": 30.0,
+  "rib_off": 100.0,
+  "pad": 20.0,
+
+  "__comment_search__": "=== 搜索容差 ===",
+  "eps": 1.0,
+  "search_box": 5.0,
+  "search_eps": 1.0,
+
+  "__comment_sim__": "=== Day5 仿真参数 ===",
+  "mesh_size": 20.0,
+  "use_shell": false,
+  "E": 70000.0,
+  "nu": 0.33,
+  "rp_disp_u3": -1.0
+}
