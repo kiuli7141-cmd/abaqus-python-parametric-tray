@@ -1,32 +1,32 @@
-# Tray CAE Automation - Day5 Static Baseline
+# abaqus-python-parametric-tray
 
-## 1. What this repo does
+Abaqus-Python parametric tray modeling and static simulation pipeline with reusable interfaces and standardized outputs.
 
-此工程目标为托盘模型的最小静力闭环验证：
+## 1. What This Repo Does
+
+本项目用于托盘模型的最小静力闭环验证，覆盖以下流程：
 
 - 参数化托盘几何构建
 - Part-level 接口创建
 - 网格生成
 - 静力步求解
-- 结果后处理
-
----
+- ODB 后处理
+- 批量汇总输出
 
 ## 2. Current Capabilities
 
-已实现功能：
+### Implemented
 
 - 托盘几何构建与接口创建
-- solid 网格生成与静力步求解
-- RP 约束与顶面固定
+- Solid 网格生成与静力分析
+- RP 耦合加载与固定边界
+- ODB 历史输出读取（`U3` / `RF3`）
 - 结构化输出与批量汇总
 
-尚未实现的功能：
+### Not Implemented Yet
 
 - 壳单元求解链
-- 显式步与接触
-
----
+- 显式步与接触分析
 
 ## 3. Project Layout
 
@@ -42,53 +42,104 @@
 ├─ runs/
 ├─ run_day5.py
 └─ README.md
-project_root 必须同时包含：
+```
 
-src/
+`project_root` 必须同时包含：
 
-config/
+- `src/`
+- `config/`
 
-4. How to Run
-4.1 Prepare Cases
+## 4. Requirements
 
-在 config/ 中准备 JSON 配置文件，例如：
+- Abaqus/CAE available
+- Abaqus Python environment available
+- 从项目根目录运行，或显式设置 `TRAY_ROOT=<project_root>`
 
-caseA.json
+## 5. Case Configuration
 
-caseB.json
+默认批跑以下配置文件：
 
-caseC.json
+- `config/caseA.json`
+- `config/caseB.json`
+- `config/caseC.json`
 
-4.2 Enter Abaqus Environment
+当前 `run_day5.py` 会校验这些关键字段：
 
-确保运行环境是 Abaqus 可用环境。
+- `t`
+- `mesh_size`
+- `E`
+- `nu`
+- `rp_disp_u3`
+- `pad`
+- `eps`
+- `search_box`
+- `search_eps`
 
-4.3 Execute Runner
+## 6. How To Run
 
-执行 run_day5.py 脚本开始仿真：
+### Option A: Abaqus noGUI
 
+```bash
+abaqus cae noGUI=run_day5.py
+```
+
+### Option B: Abaqus Python-Capable Environment
+
+确保当前解释器可以访问 Abaqus API 后再执行：
+
+```bash
 python run_day5.py
-5. Outputs
+```
+
+## 7. Outputs
+
+### Batch-Level Outputs
+
+运行完成后，在项目根目录生成：
+
+- `summary_day5.csv`
+- `runs/_batch_summary.json`
+
+### Per-Case Outputs
 
 每个 case 输出到：
 
+```text
 runs/<case_id>/day5_static/
+```
 
-包括：
+其中通常包括：
 
-config_used.json
+- `config_used.json`
+- `metrics.json`
+- `rf_u.csv`
+- `traceback.txt`（仅失败时）
+- Abaqus job files such as `.odb`, `.msg`, `.sta`, `.log`, `.inp`
 
-metrics.json
+## 8. PASS / FAIL
 
-traceback.txt（失败时）
+### PASS = 1
 
-6. PASS / FAIL
-6.1 PASS = 1
+表示最小静力闭环通过，可用于回归比较。
 
-完成最小静力闭环。
+### PASS = 0
 
-结果可用于回归比较。
+表示某一阶段失败，可能包括：
 
-6.2 PASS = 0
+- 配置校验
+- 几何 / 接口创建
+- 网格生成
+- 边界条件或加载
+- Job 提交 / 求解
+- ODB 后处理
 
-某一阶段失败：配置、建模、网格、BC、求解或后处理。
+失败信息会写入：
+
+- `metrics.json`
+- `traceback.txt`（如有）
+
+## 9. Notes
+
+- 当前 Day5 基线面向 solid static 流程
+- 输出协议已标准化，便于后续做回归测试和批处理扩展
+- 若项目根目录无法识别，可设置环境变量 `TRAY_ROOT` 指向仓库根目录
